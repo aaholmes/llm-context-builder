@@ -144,4 +144,14 @@ if __name__ == '__main__':
 \`\`\`
 --- END FILE: tests/test_main.py ---
 
-Use CasesDebugging: Provide the LLM with the relevant files and structure to help identify bugs.Code Explanation: Ask the LLM to explain specific parts of the code in the context of the whole project.Refactoring: Get suggestions from the LLM on how to refactor parts of the codebase.Onboarding: Help new team members understand the project structure and key files quickly.Documentation: Ask the LLM to help generate documentation stubs based on the code.ContributingContributions are welcome! Please feel free to submit a Pull Request or open an Issue for bugs, feature requests, or improvements.
+## Use Cases
+
+*   **Debugging:** Provide the LLM with the relevant files and structure to help identify bugs.
+*   **Code Explanation:** Ask the LLM to explain specific parts of the code in the context of the whole project.
+*   **Refactoring:** Get suggestions from the LLM on how to refactor parts of the codebase.
+*   **Onboarding:** Help new team members understand the project structure and key files quickly.
+*   **Documentation:** Ask the LLM to help generate documentation stubs based on the code.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request or open an Issue for bugs, feature requests, or improvements.
