@@ -143,6 +143,7 @@ if __name__ == '__main__':
     unittest.main()
 \`\`\`
 --- END FILE: tests/test_main.py ---
+```
 
 ## Use Cases
 
