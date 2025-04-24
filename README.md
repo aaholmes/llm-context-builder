@@ -41,10 +41,23 @@ This tool automates the process of gathering codebase context. It walks through 
 
 ```bash
 python generate_llm_context.py <path/to/your/codebase> [options]
-Arguments:directory: (Required) The root directory of the source code project you want to process.-o, --output: (Optional) The name for the generated context file. Defaults to llm_context.txt.--max-size: (Optional) Maximum size (in bytes) for individual files to be included. Defaults to 1MB (1048576 bytes).-y, --yes: (Optional) Skip the confirmation prompt before generating the file.Example:# Generate context from './my-project', output to 'project_context.txt'
-python generate_llm_context.py ./my-project -o project_context.txt
+```
 
-# Generate context from '../another-repo' with default output name 'llm_context.txt'
+Arguments:
+* **directory**: (Required) The root directory of the source code project you want to process.
+* **--max-size**: (Optional) Maximum size (in bytes) for individual files to be included. Defaults to 1MB (1048576 bytes).
+* **-y, --yes**: (Optional) Skip the confirmation prompt before generating the file.
+
+Output Files:
+* **llm_context_files/llm_context.txt**: The latest context file generated.
+* **llm_context_files/history/llm_context_<timestamp>.txt**: A timestamped copy preserved for history.
+
+Example:
+```bash
+# Generate context from './my-project'
+python generate_llm_context.py ./my-project
+
+# Generate context from '../another-repo'
 python generate_llm_context.py ../another-repo
 
 # Generate context, skipping confirmation
@@ -52,7 +65,13 @@ python generate_llm_context.py ./my-project -y
 
 # Generate context, only including files smaller than 500KB
 python generate_llm_context.py ./my-project --max-size 512000
-Using .llmignore:Create a file named .llmignore in the root of the <path/to/your/codebase> directory. Add patterns (files, directories ending with /, or glob patterns like *.ext) one per line. Lines starting with # are ignored.Example .llmignore file:# Ignore dependency directories
+```
+
+### Using .llmignore:
+Create a file named .llmignore in the root of the <path/to/your/codebase> directory. Add patterns (files, directories ending with /, or glob patterns like *.ext) one per line. Lines starting with # are ignored.
+
+Example .llmignore file:
+# Ignore dependency directories
 node_modules/
 vendor/
 venv/
@@ -78,7 +97,10 @@ data/big_dataset.csv
 .vscode/
 .idea/
 .DS_Store
-The script will automatically pick up and use this file if it exists. It also includes some default ignores (like .git/).Example Output Format (llm_context.txt)# Project Context for: /path/to/your/codebase
+The script will automatically pick up and use this file if it exists. It also includes some default ignores (like .git/).
+
+Example Output Format (llm_context.txt)
+# Project Context for: /path/to/your/codebase
 # Generated on: 2025-04-23T15:29:00.123456
 
 ================================================================================
