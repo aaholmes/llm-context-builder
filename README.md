@@ -28,11 +28,9 @@ This tool automates the process of gathering codebase context. It walks through 
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/your-username/llm-code-context-generator.git](https://github.com/your-username/llm-code-context-generator.git)
+    git clone [https://github.com/aaholmes/llm-code-context-generator.git](https://github.com/aaholmes/llm-code-context-generator.git)
     cd llm-code-context-generator
     ```
-    *(Replace `your-username` with your actual GitHub username)*
-
 2.  **Requirements:**
     * Python 3.6+ is recommended.
     * No external libraries are needed (uses standard Python modules like `os`, `argparse`, `fnmatch`, `pathlib`).
