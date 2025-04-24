@@ -4,11 +4,17 @@ import argparse
 import fnmatch
 import sys
 from pathlib import Path
+import datetime
+import tempfile
+import shutil # Add shutil for file copying
 
 # --- Configuration ---
 IGNORE_FILE_NAME = ".llmignore"
-DEFAULT_OUTPUT_FILE = "llm_context.txt"
+# DEFAULT_OUTPUT_FILE = "llm_context.txt" # Removed default, will generate timestamped if not provided
 MAX_FILE_SIZE_BYTES = 1 * 1024 * 1024 # Max file size to include (e.g., 1MB) - adjust as needed
+OUTPUT_DIR_NAME = "llm_context_files" # Main directory for context files
+HISTORY_DIR_NAME = "history"          # Subdirectory for timestamped files
+LATEST_OUTPUT_FILENAME = "llm_context.txt" # Fixed name for the latest context file
 
 # --- Helper Functions ---
 
@@ -108,11 +114,8 @@ def main():
         "directory",
         help="The root directory of the source code.",
     )
-    parser.add_argument(
-        "-o", "--output",
-        default=DEFAULT_OUTPUT_FILE,
-        help="The name of the output text file."
-    )
+    # The -o/--output argument is removed as we now always write to two files:
+    # a timestamped one and llm_context.txt
     parser.add_argument(
         "--max-size",
         type=int,
@@ -128,8 +131,33 @@ def main():
     args = parser.parse_args()
 
     root_dir = args.directory
-    output_file = args.output
+    # output_file = args.output # Determined below based on args
     max_size = args.max_size
+
+    # Determine output directory and file paths
+    output_base_dir = os.path.abspath(OUTPUT_DIR_NAME)
+    history_dir = os.path.join(output_base_dir, HISTORY_DIR_NAME)
+    latest_output_path = os.path.join(output_base_dir, LATEST_OUTPUT_FILENAME)
+
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamped_filename = f"llm_context_{timestamp}.txt"
+    timestamped_output_path = os.path.join(history_dir, timestamped_filename)
+
+    # Create directories if they don't exist
+    try:
+        os.makedirs(output_base_dir, exist_ok=True)
+        os.makedirs(history_dir, exist_ok=True)
+        print(f"INFO: Ensured output directories exist:")
+        print(f"      - Base:    {output_base_dir}")
+        print(f"      - History: {history_dir}")
+    except OSError as e:
+        print(f"Error: Could not create output directories: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+    print(f"INFO: Output will be written to:")
+    print(f"      - Timestamped: {timestamped_output_path}")
+    print(f"      - Latest:      {latest_output_path}")
 
     if not os.path.isdir(root_dir):
         print(f"Error: Directory not found: {root_dir}", file=sys.stderr)
@@ -242,7 +270,7 @@ def main():
                 break
 
     print("-" * 60)
-    print(f"Output will be written to: {os.path.abspath(output_file)}")
+    # Print statement moved up to where filenames are determined
     print(f"\nTo exclude specific files/directories, create a '{IGNORE_FILE_NAME}' file")
     print(f"in '{os.path.abspath(root_dir)}' with one pattern per line (e.g., '*.log', 'dist/', 'config. Hjson').")
     print("-" * 60)
@@ -259,9 +287,11 @@ def main():
 
 
     # --- 4. Generate Output File ---
-    print(f"\nGenerating {output_file}...")
+    print(f"\nGenerating context files...")
+    # Generate content into the timestamped file first
     try:
-        with open(output_file, 'w', encoding='utf-8') as outfile:
+        # Write to the timestamped file in the history directory
+        with open(timestamped_output_path, 'w', encoding='utf-8') as outfile:
             # --- Header ---
             outfile.write(f"# Project Context for: {os.path.abspath(root_dir)}\n")
             outfile.write(f"# Generated on: {__import__('datetime').datetime.now().isoformat()}\n\n")
@@ -298,13 +328,21 @@ def main():
                     outfile.write(f"--- END ERROR: {rel_path} ---\n\n")
                     print(f"WARNING: Could not read file {rel_path}: {e}", file=sys.stderr)
 
-        print(f"\nSuccessfully generated context file: {os.path.abspath(output_file)}")
+        print(f"\nSuccessfully generated timestamped context file: {timestamped_output_path}") # Use correct path variable
+
+        # Now copy the timestamped file to the latest file path in the base output directory
+        try:
+            shutil.copyfile(timestamped_output_path, latest_output_path) # Use correct path variables
+            print(f"Successfully updated latest context file: {latest_output_path}") # Use correct path variable
+        except Exception as copy_e:
+            print(f"\nError copying {timestamped_output_path} to {latest_output_path}: {copy_e}", file=sys.stderr) # Use correct path variables
+            # Don't exit here, the primary file was still created
 
     except IOError as e:
-        print(f"\nError writing to output file {output_file}: {e}", file=sys.stderr)
+        print(f"\nError writing to output file {timestamped_output_path}: {e}", file=sys.stderr) # Use correct path variable
         sys.exit(1)
     except Exception as e:
-        print(f"\nAn unexpected error occurred during file generation: {e}", file=sys.stderr)
+        print(f"\nAn unexpected error occurred during timestamped file generation: {e}", file=sys.stderr) # Clarify error source
         sys.exit(1)
 
 if __name__ == "__main__":
