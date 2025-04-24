@@ -69,6 +69,7 @@ python generate_llm_context.py ./my-project --max-size 512000
 Create a file named .llmignore in the root of the <path/to/your/codebase> directory. Add patterns (files, directories ending with /, or glob patterns like *.ext) one per line. Lines starting with # are ignored.
 
 Example .llmignore file:
+```bash
 # Ignore dependency directories
 node_modules/
 vendor/
@@ -95,9 +96,11 @@ data/big_dataset.csv
 .vscode/
 .idea/
 .DS_Store
+```
 The script will automatically pick up and use this file if it exists. It also includes some default ignores (like .git/).
 
 Example Output Format (llm_context.txt)
+```bash
 # Project Context for: /path/to/your/codebase
 # Generated on: 2025-04-23T15:29:00.123456
 
